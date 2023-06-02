@@ -61,3 +61,7 @@ systemLogin(S1, User, S2) :-
     member(NewUser,L2),
     append(L1,[NewUser], NewCurrentUser),
     S2 = [Nombre, Timestamp, NewCurrentUser, L2, L3, L4, L5, L6].
+
+systemLogout(S1,S2) :-
+    S1 = [Nombre, Timestamp, _, L2, L3, L4, L5, L6],
+    S2 = [Nombre, Timestamp, [], L2, L3, L4, L5, L6].
