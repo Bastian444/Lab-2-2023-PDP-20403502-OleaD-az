@@ -1,22 +1,8 @@
-/*
-Laboratario N° 2 - Paradigmas de Programación (1-2023)
-
-Paradigma: Lógico
-Lenguaje de programación: Prolog
-Estudiante: Bastián Olea Díaz
-
-TDA's:
-    ·System
-    ·User
-    ·Drive
-    ·File
-    ·Directorio
-*/
-
 % Definición del TDA
 tda_system([Nombre, Timestamp, [], [], [], [], [], []], Nombre, Timestamp).
 tda_drive([Letter, String, Number], Letter, String, Number).
 tda_user(Name, Name).
+
 
 % No requeridos
 getFirstElement([], []).
@@ -33,7 +19,10 @@ userRep(String, List) :-
     \+ (select(String, List, _)),
     !.
 
-isnull([]).
+isnull([]). % Para preguntar por no null añadir not, es decir, not(isnull(algo))
+
+checkDrive(Letter, Lists) :-
+    member([Letter|_], Lists).
 
 % Requerimientos funcionales
 system(TDA, Nombre) :-
@@ -65,3 +54,10 @@ systemLogin(S1, User, S2) :-
 systemLogout(S1,S2) :-
     S1 = [Nombre, Timestamp, _, L2, L3, L4, L5, L6],
     S2 = [Nombre, Timestamp, [], L2, L3, L4, L5, L6].
+
+systemSwitchDrive(S1, Letter, S2) :-    
+    S1 = [Nombre, Timestamp, L1, L2, L3, _, L5, L6],
+    not(isnull(L1)), % Checkear que haya un usuario logeado
+    checkDrive(Letter,L3),
+    append([],Letter, NewCurrentDrive), % Resetear el drive
+    S2 = [Nombre, Timestamp, L1, L2, L3, NewCurrentDrive, L5, L6].
