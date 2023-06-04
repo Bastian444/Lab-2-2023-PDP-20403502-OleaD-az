@@ -2,9 +2,12 @@
 tda_system([Nombre, Timestamp, [], [], [], [], [], []], Nombre, Timestamp).
 tda_drive([Letter, String, Number], Letter, String, Number).
 tda_user(Name, Name).
-
+tda_path([StringPath,User,Drive,_,_],StringPath,User,Drive).
 
 % No requeridos
+get_first_element([String], String).
+
+
 getFirstElement([], []).
 getFirstElement([[First|_]|Rest], [First|Firsts]) :-
     getFirstElement(Rest, Firsts).
@@ -21,8 +24,13 @@ userRep(String, List) :-
 
 isnull([]). % Para preguntar por no null añadir not, es decir, not(isnull(algo))
 
-checkDrive(Letter, Lists) :-
+checkDrive(Letter, Lists) :- % Checkear que sea una letra de un drive, que ya exista
     member([Letter|_], Lists).
+
+path([StringPath, User, Drive, Timestamp1, Timestamp2], StringPath, User, Drive) :-
+    get_time(Timestamp1),
+    get_time(Timestamp2),
+    tda_path(_,_,User,Drive).
 
 % Requerimientos funcionales
 system(TDA, Nombre) :-
@@ -61,3 +69,11 @@ systemSwitchDrive(S1, Letter, S2) :-
     checkDrive(Letter,L3),
     append([],Letter, NewCurrentDrive), % Resetear el drive
     S2 = [Nombre, Timestamp, L1, L2, L3, NewCurrentDrive, L5, L6].
+
+systemMkdir(S1,StringPath,S2) :-
+    S1 = [Nombre, Timestamp, L1, L2, L3, L4, L5, L6],
+    not(isnull(L1)), % Checkear que haya un usuario logeado
+    get_first_element(L1,Cosa),
+    path(Path,StringPath,Cosa,L4),
+    append(L6,[Path],NewPaths),
+    S2 = [Nombre, Timestamp, L1, L2, L3, L4, L5, NewPaths].
