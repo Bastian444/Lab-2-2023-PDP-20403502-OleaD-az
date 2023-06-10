@@ -165,3 +165,12 @@ systemCd(S1, StringPath, S2) :- % '././././' - Redy
     puntosySlashes(StringPath),
     S1 = [Nombre, Timestamp, L1, L2, L3, L4, L5, L6],
     S2 = [Nombre, Timestamp, L1, L2, L3, L4, L5, L6].
+
+% systemAddFile
+
+systemAddFile(S1, File, S2) :-
+    S1 = [Nombre, Timestamp, L1, L2, L3, L4, L5, L6],
+    append(File,L1,FileWithUser),
+    append(FileWithUser,L5,FileWithPath),
+    append(L6,[FileWithPath],NewPaths),
+    S2 = [Nombre, Timestamp, L1, L2, L3, L4, L5, NewPaths].
