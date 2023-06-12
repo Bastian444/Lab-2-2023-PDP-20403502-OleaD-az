@@ -19,7 +19,21 @@ tda_path([StringPath,User,Drive,_,_],StringPath,User,Drive).
 % Nombre 
 % Dominio:
 % Descripción:
-file(Name,Content,[Name, Content]).
+file(Name,Content,File) :-
+    extGetter(Name,Ext),
+    unlistOneElement(Ext,Extension),
+    File = [Name,Content,Extension].
+
+% Nombre 
+% Dominio:
+% Descripción:
+extGetter(String, Ext) :-
+    split_string(String,".","",[_|Ext]).
+
+% Nombre 
+% Dominio:
+% Descripción:
+unlistOneElement([X], X).
 
 % No requeridos
 % Nombre 
@@ -129,7 +143,72 @@ puntosySlashes(S) :-
     string_codes(S, Codes),
     maplist([C]>>(C=46;C=47), Codes).
 
-% Requerimientos funcionales
+% Nombre 
+% Dominio:
+% Descripción:
+fileFinder(_, [], []).
+fileFinder(Key, [[Key|Rest] | _], [Key|Rest]).
+fileFinder(Key, [_|RestLists], Result) :-
+    fileFinder(Key, RestLists, Result).
+
+% Nombre 
+% Dominio:
+% Descripción:
+ifFileName(String) :-
+    string_codes(String, Codes),
+    validFileName(Codes).
+
+validFileName([]).
+validFileName([Code|Rest]) :-
+    (   Code = 46 % dot
+    ;   Code >= 48, Code =< 57 % numbers 0-9
+    ;   Code >= 65, Code =< 90 % uppercase letters
+    ;   Code >= 97, Code =< 122 % lowercase letters
+    ),
+    validFileName(Rest).
+
+% Nombre 
+% Dominio:
+% Descripción:
+fileDeleter(_, [], []).
+fileDeleter(Key, [[Key|_]|RestLists], Result) :-
+    fileDeleter(Key, RestLists, Result).
+fileDeleter(Key, [List|RestLists], [List|Result]) :-
+    fileDeleter(Key, RestLists, Result).
+
+% Nombre 
+% Dominio:
+% Descripción:
+ifExtension(String) :-
+    atom_chars(String, [A, B, C | _]),
+    A = '*',
+    B = '.',
+    char_type(C, alpha).
+
+% Nombre 
+% Dominio:
+% Descripción:
+deleteByExtension(_, [], []).
+deleteByExtension(String, [[_, X] | Rest], Result) :-
+    X \= String,
+    deleteByExtension(String, Rest, NewResult),
+    Result = [[_, X] | NewResult].
+deleteByExtension(String, [[_, String] | Rest], Result) :-
+    deleteByExtension(String, Rest, Result).
+
+% Nombre 
+% Dominio:
+% Descripción:
+toBeRemovedByExtension(_, [], []).
+toBeRemovedByExtension(String, [[_, String] | Rest], Result) :-
+    toBeRemovedByExtension(String, Rest, NewResult),
+    Result = [[_, String] | NewResult].
+toBeRemovedByExtension(String, [[_, X] | Rest], Result) :-
+    X \= String,
+    toBeRemovedByExtension(String, Rest, Result).
+
+
+% **************************************** Requerimientos funcionales *********************************************
 
 % Nombre 
 % Dominio:
@@ -259,4 +338,27 @@ systemAddFile(S1, File, S2) :-
     append(FileWithUser,L5,FileWithPath),
     append(L6,[FileWithPath],NewPaths),
     S2 = [Nombre, Timestamp, L1, L2, L3, L4, L5, NewPaths, L7].
+
+% systemDel
+% Nombre 
+% Dominio:
+% Descripción:
+systemDel(S1,PathToDel,S2) :- % Caso de "file.txt" - REDY
+    ifFileName(PathToDel),
+    S1 = [Nombre, Timestamp, L1, L2, L3, L4, L5, L6, L7],
+    fileFinder(PathToDel,L6,FileToBeRemoved),
+    append(L7,[FileToBeRemoved],NewTrash),
+    fileDeleter(PathToDel,L6,NewRutas),
+    S2 = [Nombre, Timestamp, L1, L2, L3, L4, L5, NewRutas, NewTrash].
+
+systemDel(S1,PathToDel,S2) :- % Caso de "*.txt" - Not Working
+    ifExtension(PathToDel),
+    S1 = [Nombre, Timestamp, L1, L2, L3, L4, L5, L6, L7],
+    extGetter(PathToDel,Ext),
+    unlistOneElement(Ext,Extension),
+    toBeRemovedByExtension(Extension,L6,Trash),
+    deleteByExtension(Extension,L6,NewRutas),
+    append(L7,Trash,NewTrash),
+    S2 = [Nombre, Timestamp, L1, L2, L3, L4, L5, NewRutas, NewTrash].
+    
     
