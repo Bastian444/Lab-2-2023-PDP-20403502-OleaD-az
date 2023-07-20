@@ -1,3 +1,8 @@
+:- use_module(tda_system_20403502_OleaDiaz).
+:- use_module(tda_user_20403502_OleaDiaz).
+:- use_module(tda_file_20403502_OleaDiaz).
+:- use_module(tda_drive_20403502_OleaDiaz).
+
 /*
  -----------------------------------------------------------
  Laboratorio N°2 - Paradigmas de programación
@@ -6,34 +11,12 @@
  Profesor: Gonzalo Martínez
  -----------------------------------------------------------
  */
-
-% TDA System
-% Dominio: System x Nombre x Timestamp
-% Descripción: Recibe un nombre y un timestamp, para unificar a una lista.
-tda_system([Nombre, Timestamp, [], [], [], [], [], [], []], Nombre, Timestamp).
-
-% TDA Drive
-% Dominio: Drive x Letra x Nombre x Capacidad
-% Descripción: Crea un drive a parte de los valores ingresados.
-tda_drive([Letter, String, Number], Letter, String, Number).
-
-% TDA User
-% Dominio: Usuario x Nombre
-% Descripción: Crea un usuario a partir del nombre dado.
-tda_user(Name, Name).
-
+% ************************************* Otras Funciones *******************************
+% 
 % TDA Path
 % Dominio: Path x Ruta x Usuario x Drive
 % Descripción: Crea una ruta a partir de un path, usuario activo y drive.
 tda_path([StringPath,User,Drive,_,_],StringPath,User,Drive).
-
-% TDA File
-% Dominio: Nombre x Contenido x File  
-% Descripción: Crea un archivo a partir de su nombre, contenido.
-file(Name,Content,File) :- 
-    extGetter(Name,Ext),
-    unlistOneElement(Ext,Extension),
-    File = [Name,Content,Extension].
 
 % extGetter
 % Dominio: Nombre de archivo x Extension este
@@ -47,8 +30,6 @@ extGetter(String, Ext) :-
 % Descripción: El unico propósito que cumple es desenlistar.
 % Ejemplo: unlistOneElement(["Nombre de Usuario"], Elemento). Elemento = "Nombre de Usuario".
 unlistOneElement([X], X).
-
-
 
 % getFirstElement
 % Dominio: Lista x Lista
@@ -218,13 +199,16 @@ toBeRemovedByExtension(String, [[_, X] | Rest], Result) :-
     X \= String,
     toBeRemovedByExtension(String, Rest, Result).
 
-
-% **************************************** Requerimientos funcionales *********************************************
+% ************************************************************************************************************************
+% ************************************************************************************************************************
+% ********************************************** Requerimientos funcionales **********************************************
+% ************************************************************************************************************************
+%  ************************************************************************************************************************
 
 % system - Constructor
 % Dominio: System x Nombre del sistema
 % Descripción: Crea un sistema a partir de un nombre.
-system(TDA, Nombre) :-
+system(Nombre, TDA) :-
     get_time(Timestamp),
     tda_system(TDA, Nombre, Timestamp).
 
@@ -368,4 +352,3 @@ systemDel(S1,PathToDel,S2) :- % Caso de "*.txt" - Not Working
     deleteByExtension(Extension,L6,NewRutas),
     append(L7,Trash,NewTrash),
     S2 = [Nombre, Timestamp, L1, L2, L3, L4, L5, NewRutas, NewTrash].
-    
