@@ -3,6 +3,8 @@
 :- use_module(tda_file_20403502_OleaDiaz).
 :- use_module(tda_drive_20403502_OleaDiaz).
 
+
+
 /*
  -----------------------------------------------------------
  Laboratorio N°2 - Paradigmas de programación
@@ -265,10 +267,16 @@ systemSwitchDrive(S1, Letter, S2) :-
 % Descripción: Crea un directorio, debe previamente haber un usuario logeado.
 systemMkdir(S1, StringPath,S2) :-
     S1 = [Nombre, Timestamp, L1, L2, L3, L4, L5, L6, L7],
-    \+ (isnull(L1)), % Checkear que haya un usuario logeado
-    get_first_element_string(L1,Cosa),
-    path(Path,StringPath,Cosa,L4),
-    append(L6,[Path],NewPaths),
+    \+ isnull(L1),
+    get_first_element_string(L1, Cosa),
+    (isnull(L5)
+    -> FullPath = StringPath
+    ; get_first_element_string(L5, SubString),
+      atomic_list_concat([SubString,StringPath], '/', FullPath)
+    ),
+    path(Path, FullPath, Cosa, L4),
+    append(L6, [Path], NewPaths),
+    write('Rutas del sistema (Nuevo directorio agregado): '), write(NewPaths), nl,
     S2 = [Nombre, Timestamp, L1, L2, L3, L4, L5, NewPaths, L7].
 
 % systemCd
@@ -330,6 +338,7 @@ systemAddFile(S1, File, S2) :-
     append(File,L1,FileWithUser),
     append(FileWithUser,L5,FileWithPath),
     append(L6,[FileWithPath],NewPaths),
+    write('Rutas del sistema (Nuevo archivo agregado): '), write(NewPaths), nl,
     S2 = [Nombre, Timestamp, L1, L2, L3, L4, L5, NewPaths, L7].
 
 % systemDel
